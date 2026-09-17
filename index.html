@@ -1,201 +1,182 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Microsoft Foundry AI Demo</title>
-    <style>
-        :root {
-            --primary: #0078d4; /* Microsoft Blue */
-            --bg: #f3f2f1;
-            --chat-bg: #ffffff;
-            --text: #323130;
-        }
+<!DOCTYPE html> <html lang="en"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>Microsoft Foundry AI Demo</title>
+<style>
+    * {
+        box-sizing: border-box;
+    }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
+    body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Segoe UI", Arial, sans-serif;
+        background: linear-gradient(135deg, #0078d4, #5b2dab);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        color: #323130;
+    }
 
-        .chat-container {
-            width: 100%;
-            max-width: 600px;
-            height: 80vh;
-            background: var(--chat-bg);
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
+    .container {
+        width: 100%;
+        max-width: 700px;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+        overflow: hidden;
+    }
 
-        .chat-header {
-            background-color: var(--primary);
-            color: white;
-            padding: 15px;
-            font-weight: bold;
-            font-size: 1.1rem;
-        }
+    .header {
+        background: #0078d4;
+        color: white;
+        padding: 30px;
+        text-align: center;
+    }
 
-        .chat-messages {
-            flex: 1;
-            padding: 15px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
+    .header h1 {
+        margin: 0 0 10px;
+        font-size: 30px;
+    }
 
-        .message {
-            max-width: 75%;
-            padding: 10px 14px;
-            border-radius: 18px;
-            font-size: 0.95rem;
-            line-height: 1.4;
-        }
+    .header p {
+        margin: 0;
+        font-size: 16px;
+        opacity: 0.9;
+    }
 
-        .message.user {
-            background-color: var(--primary);
-            color: white;
-            align-self: flex-end;
-            border-bottom-right-radius: 2px;
-        }
+    .content {
+        padding: 30px;
+    }
 
-        .message.ai {
-            background-color: #edebe9;
-            color: var(--text);
-            align-self: flex-start;
-            border-bottom-left-radius: 2px;
-        }
+    .status {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 15px;
+        margin-bottom: 25px;
+        background: #e7f6e7;
+        border: 1px solid #8fd18f;
+        border-radius: 8px;
+        color: #107c10;
+    }
 
-        .chat-input-area {
-            display: flex;
-            padding: 15px;
-            border-top: 1px solid #edebe9;
-            gap: 10px;
-            background: #faf9f8;
-        }
+    .status-dot {
+        width: 12px;
+        height: 12px;
+        background: #107c10;
+        border-radius: 50%;
+    }
 
-        input[type="text"] {
-            flex: 1;
-            padding: 12px;
-            border: 1px solid #a19f9d;
-            border-radius: 4px;
-            outline: none;
-            font-size: 1rem;
-        }
+    .card {
+        border: 1px solid #edebe9;
+        border-radius: 10px;
+        padding: 25px;
+        margin-bottom: 20px;
+    }
 
-        input[type="text"]:focus {
-            border-color: var(--primary);
-        }
+    .card h2 {
+        margin-top: 0;
+        color: #0078d4;
+    }
 
-        button {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            padding: 0 20px;
-            border-radius: 4px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
+    .card p {
+        line-height: 1.6;
+    }
 
-        button:hover {
-            background-color: #106ebe;
-        }
+    button {
+        width: 100%;
+        padding: 15px;
+        background: #0078d4;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+    }
 
-        button:disabled {
-            background-color: #c8c6c4;
-            cursor: not-allowed;
-        }
-    </style>
-</head>
-<body>
+    button:hover {
+        background: #106ebe;
+    }
 
-    <div class="chat-container">
-        <div class="chat-header">🌐 Microsoft Foundry AI Demo</div>
-        <div class="chat-messages" id="chatMessages">
-            <div class="message ai">Hello! I am connected via your Azure deployment. How can I help you today?</div>
-        </div>
-        <form class="chat-input-area" id="chatForm">
-            <input type="text" id="userInput" placeholder="Type your message here..." autocomplete="off" required>
-            <button type="submit" id="sendBtn">Send</button>
-        </form>
+    #result {
+        display: none;
+        margin-top: 20px;
+        padding: 15px;
+        background: #f3f2f1;
+        border-radius: 8px;
+        color: #323130;
+    }
+
+    .footer {
+        text-align: center;
+        padding: 20px;
+        background: #faf9f8;
+        border-top: 1px solid #edebe9;
+        color: #605e5c;
+        font-size: 14px;
+    }
+</style>
+
+</head> <body>
+<div class="container">
+
+    <div class="header">
+        <h1>🌐 Microsoft Foundry AI Demo</h1>
+        <p>Azure Static Web Apps</p>
     </div>
 
-    <script>
-        const chatMessages = document.getElementById('chatMessages');
-        const chatForm = document.getElementById('chatForm');
-        const userInput = document.getElementById('userInput');
-        const sendBtn = document.getElementById('sendBtn');
+    <div class="content">
 
-        // Helper to append messages to the screen
-        function appendMessage(text, sender) {
-            const messageDiv = document.createElement('div');
-            messageDiv.classList.add('message', sender);
-            messageDiv.textContent = text;
-            chatMessages.appendChild(messageDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight; // Auto-scroll to bottom
-        }
+        <div class="status">
+            <div class="status-dot"></div>
+            <strong>Application is running successfully</strong>
+        </div>
 
-        chatForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const messageText = userInput.value.trim();
-            if (!messageText) return;
+        <div class="card">
+            <h2>Welcome!</h2>
 
-            // 1. Display user message
-            appendMessage(messageText, 'user');
-            userInput.value = '';
-            
-            // Disable UI while waiting for response
-            userInput.disabled = true;
-            sendBtn.disabled = true;
+            <p>
+                This is a simple static web application deployed with
+                Microsoft Azure Static Web Apps.
+            </p>
 
-            // 2. Add a temporary loading text from AI
-            const loadingDiv = document.createElement('div');
-            loadingDiv.classList.add('message', 'ai');
-            loadingDiv.textContent = 'Thinking...';
-            chatMessages.appendChild(loadingDiv);
+            <p>
+                This demo uses only HTML, CSS, and JavaScript.
+                No Node.js, npm, database, or backend is required.
+            </p>
+        </div>
 
-            try {
-                // 3. Call your Azure backend API
-                // Note: /api/chat assumes you use Azure Functions or an App Service route mapping.
-                const response = await fetch('/api/chat', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ message: messageText })
-                });
+        <div class="card">
+            <h2>Test the Application</h2>
 
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
+            <p>
+                Click the button below to verify that JavaScript is
+                working correctly.
+            </p>
 
-                const data = await response.json();
-                
-                // Remove loading indicator and show real text
-                loadingDiv.remove();
-                appendMessage(data.reply, 'ai');
+            <button onclick="runDemo()">
+                Run Demo
+            </button>
 
-            </style>
-            } catch (error) {
-                console.error('Error fetching AI response:', error);
-                loadingDiv.remove();
-                appendMessage('Sorry, I encountered an error connecting to the AI backend.', 'ai');
-            } finally {
-                // Re-enable UI
-                userInput.disabled = false;
-                sendBtn.disabled = false;
-                userInput.focus();
-            }
-        });
-    </script>
-</body>
-</html>
+            <div id="result">
+                ✅ Success! Your static web application is working correctly.
+            </div>
+        </div>
+
+    </div>
+
+    <div class="footer">
+        Microsoft Foundry AI Demo &nbsp;|&nbsp; Azure Static Web Apps
+    </div>
+
+</div>
+
+<script>
+    function runDemo() {
+        const result = document.getElementById("result");
+
+        result.style.display = "block";
+    }
+</script>
+
+</body> </html>
